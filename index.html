@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía de comandos GNU/Linux</title>
+<style>
+:root{--bg:#f6f7f4;--fg:#1d2321;--mut:#5d6a65;--card:#fff;--bd:#d9dfdb;--ac:#0b6e5b;--acf:#fff;--code:#10201c;--codefg:#d7f5e6;--warn:#8a4b00}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1715;--fg:#e4ece8;--mut:#93a39c;--card:#17211e;--bd:#2a3833;--ac:#4cc9a3;--acf:#07231b;--code:#0a100e;--codefg:#c8f0de;--warn:#f0b35c}}
+:root[data-theme="dark"]{--bg:#0f1715;--fg:#e4ece8;--mut:#93a39c;--card:#17211e;--bd:#2a3833;--ac:#4cc9a3;--acf:#07231b;--code:#0a100e;--codefg:#c8f0de;--warn:#f0b35c}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "Inter",system-ui,sans-serif}
+.w{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font:700 clamp(1.7rem,5vw,2.5rem)/1.15 "JetBrains Mono",ui-monospace,monospace;margin:.4em 0 .2em}
+.sub{color:var(--mut);max-width:60ch;margin:0 0 18px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:10px 0;z-index:5;border-bottom:1px solid var(--bd)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px}
+.tabs button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:8px 14px;border-radius:8px;font:inherit;font-size:.92rem;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:600}
+input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);font:inherit}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.lv{margin:18px 0 6px;color:var(--mut)}
+details{background:var(--card);border:1px solid var(--bd);border-radius:10px;margin:10px 0}
+summary{cursor:pointer;padding:12px 14px;list-style:none;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+summary::-webkit-details-marker{display:none}
+summary b{font:700 1.05rem "JetBrains Mono",ui-monospace,monospace;color:var(--ac)}
+summary span{color:var(--mut);font-size:.9rem;flex:1 1 220px}
+.in{padding:0 14px 14px}
+.in p{margin:0 0 10px}
+.ex{display:flex;gap:8px;align-items:stretch;margin:8px 0 2px}
+code{flex:1;min-width:0;overflow-x:auto;white-space:pre;background:var(--code);color:var(--codefg);padding:8px 10px;border-radius:6px;font:.88rem "JetBrains Mono",ui-monospace,monospace}
+.ex button{border:1px solid var(--bd);background:none;color:var(--mut);border-radius:6px;padding:0 10px;font:inherit;font-size:.8rem;cursor:pointer}
+.n{color:var(--mut);font-size:.86rem;margin:0 0 6px}
+.tag{display:inline-block;font-size:.8rem;color:var(--warn);border:1px solid var(--warn);border-radius:99px;padding:0 8px;margin-bottom:8px}
+.tip{border-left:3px solid var(--ac);padding:2px 12px;color:var(--mut);margin:14px 0}
+.empty{color:var(--mut);padding:30px 0;text-align:center}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>$ man linux</h1>
+<p class="sub">Comandos de GNU/Linux explicados con ejemplos. Los básicos funcionan en cualquier distribución; los niveles superiores y el anexo piensan en Debian, Ubuntu y Fedora (y sus versiones de servidor).</p>
+<div class="bar">
+<div class="tabs" role="tablist" id="tabs"></div>
+<input id="q" type="search" placeholder="Buscar comando o palabra (ej. permisos, red, copiar)" aria-label="Buscar">
+</div>
+<div id="out"></div>
+</div>
+<script>
+const D=[
+{id:'b',t:'Básicos',d:'Para empezar. Válidos en cualquier distribución.',c:[
+['ls','Lista el contenido de un directorio.',[['ls -l','Formato largo: permisos, dueño, tamaño y fecha'],['ls -lah','Incluye ocultos y tamaños legibles'],['ls -lt /var/log','Ordena por fecha de modificación']]],
+['cd','Cambia de directorio.',[['cd /etc','Ruta absoluta'],['cd ..','Sube un nivel'],['cd -','Vuelve al directorio anterior; «cd» a secas va a tu home']]],
+['pwd','Muestra la ruta del directorio actual.',[['pwd',''],['pwd -P','Resuelve enlaces simbólicos'],['echo "Estoy en $(pwd)"','Úsalo dentro de otros comandos']]],
+['mkdir','Crea directorios.',[['mkdir proyectos',''],['mkdir -p app/src/css','Crea toda la ruta de golpe'],['mkdir dia{1,2,3}','Crea dia1, dia2 y dia3']]],
+['touch','Crea un archivo vacío o actualiza su fecha.',[['touch notas.txt',''],['touch a.txt b.txt c.txt','Varios a la vez'],['touch -d "2026-01-01" viejo.txt','Fija una fecha concreta']]],
+['cp','Copia archivos y directorios.',[['cp a.txt b.txt',''],['cp -r fotos fotos_copia','-r para directorios'],['cp -i *.jpg ~/imagenes','-i pregunta antes de sobrescribir']]],
+['mv','Mueve o renombra.',[['mv viejo.txt nuevo.txt','Renombrar'],['mv informe.pdf ~/docs/','Mover'],['mv -i *.log /tmp','Pregunta antes de sobrescribir']]],
+['rm','Borra archivos. No hay papelera: es definitivo.',[['rm prueba.txt',''],['rm -r carpeta','Borra un directorio y su contenido'],['rm -i *.tmp','Confirma cada borrado (recomendado al empezar)']]],
+['cat','Muestra el contenido de un archivo.',[['cat /etc/hostname',''],['cat -n script.sh','Numera las líneas'],['cat a.txt b.txt > todo.txt','Concatena en un archivo nuevo']]],
+['less','Lee archivos largos página a página (q para salir, / para buscar).',[['less /var/log/syslog',''],['less -N config.conf','Con números de línea'],['ls -l /etc | less','Pagina la salida de otro comando']]],
+['echo','Imprime texto o variables.',[['echo "Hola"',''],['echo $HOME','Valor de una variable'],['echo "linea" >> log.txt','Añade al final de un archivo']]],
+['man','Manual de cualquier comando (q para salir).',[['man ls',''],['man -k copiar','Busca páginas por palabra clave'],['ls --help','Ayuda rápida de la mayoría de comandos']]]
+]},
+{id:'i',t:'Intermedios',d:'Filtrar, buscar, permisos, procesos y archivos comprimidos.',c:[
+['grep','Busca texto dentro de archivos o salidas.',[['grep -i error /var/log/syslog','Sin distinguir mayúsculas'],['grep -rn "TODO" ./src','Recursivo, con número de línea'],['ps aux | grep nginx','Filtra la salida de otro comando']]],
+['find','Localiza archivos por nombre, tipo, tamaño o fecha.',[['find /etc -name "*.conf"',''],['find ~ -type f -size +100M','Archivos de más de 100 MB'],['find . -mtime -1','Modificados en las últimas 24 h']]],
+['chmod','Cambia permisos (r=4, w=2, x=1).',[['chmod +x script.sh','Hacerlo ejecutable'],['chmod 644 notas.txt','Dueño lee/escribe, resto solo lee'],['chmod -R u+rwX,go-w web/','Recursivo y simbólico']]],
+['chown','Cambia dueño y grupo.',[['sudo chown ana archivo.txt',''],['sudo chown ana:devs proyecto.txt','Dueño y grupo'],['sudo chown -R www-data:www-data /var/www','Recursivo']]],
+['tar','Empaqueta y comprime.',[['tar -czf copia.tar.gz carpeta/','Crear .tar.gz'],['tar -xzf copia.tar.gz','Extraer'],['tar -tf copia.tar.gz','Listar sin extraer']]],
+['head / tail','Primeras o últimas líneas de un archivo.',[['head -n 20 datos.csv',''],['tail -n 50 /var/log/syslog',''],['tail -f /var/log/syslog','Sigue el archivo en vivo (Ctrl+C para salir)']]],
+['sort, uniq, wc','Ordenar, quitar duplicados y contar.',[['sort -n numeros.txt','Orden numérico'],['sort ips.txt | uniq -c | sort -nr','Frecuencia de cada línea'],['wc -l archivo.txt','Cuenta líneas']]],
+['ps, kill','Ver y terminar procesos.',[['ps aux','Todos los procesos'],['kill 1234','Pide terminar al PID 1234 (SIGTERM)'],['pkill -9 firefox','Forzar cierre por nombre']]],
+['df, du','Espacio en discos y directorios.',[['df -h','Uso por sistema de archivos'],['du -sh ~/Descargas','Tamaño total de una carpeta'],['du -h --max-depth=1 / | sort -h','Qué ocupa más']]],
+['ln','Crea enlaces.',[['ln -s /var/www/html web','Enlace simbólico'],['ln original.txt duro.txt','Enlace duro'],['ls -l web','Comprueba hacia dónde apunta']]]
+]},
+{id:'a',t:'Avanzados',d:'Automatizar, procesar datos, depurar y administrar a fondo.',c:[
+['sed','Edita texto en flujo con expresiones regulares.',[['sed "s/viejo/nuevo/g" a.txt','Sustituye en pantalla'],['sed -i.bak "s/80/8080/" app.conf','Edita en el archivo y deja copia .bak'],['sed -n "10,20p" log.txt','Imprime solo las líneas 10 a 20']]],
+['awk','Procesa columnas y aplica lógica por línea.',[['awk \'{print $1,$3}\' datos.txt','Columnas 1 y 3'],['awk -F: \'{print $1}\' /etc/passwd','Separador personalizado'],['awk \'{s+=$2} END{print s}\' ventas.txt','Suma de una columna']]],
+['xargs','Convierte la entrada en argumentos de otro comando.',[['find . -name "*.tmp" | xargs rm',''],['find . -print0 | xargs -0 ls -l','Seguro con espacios en nombres'],['cat urls.txt | xargs -P4 -n1 curl -O','4 descargas en paralelo']]],
+['rsync','Sincroniza directorios, local o por SSH, solo lo que cambió.',[['rsync -av origen/ destino/',''],['rsync -avz --delete web/ user@srv:/var/www/','Remoto, comprimido y espejo exacto'],['rsync -avn origen/ destino/','-n simula sin copiar']]],
+['crontab','Programa tareas periódicas.',[['crontab -e','Edita tus tareas'],['0 3 * * * /opt/backup.sh','Cada día a las 3:00 (línea del crontab)'],['crontab -l','Lista tus tareas']]],
+['journalctl','Consulta los registros de systemd.',[['journalctl -u nginx --since today','Un servicio, desde hoy'],['journalctl -p err -b','Errores del arranque actual'],['journalctl -f','Seguimiento en vivo']]],
+['lsof','Muestra archivos y puertos abiertos por procesos.',[['sudo lsof -i :80','Quién usa el puerto 80'],['lsof -u ana','Archivos abiertos por un usuario'],['lsof +D /mnt/datos','Qué impide desmontar un directorio']]],
+['strace','Traza las llamadas al sistema de un proceso.',[['strace -f -o traza.txt ./programa','Registra en un archivo'],['sudo strace -p 1234','Se engancha a un proceso en marcha'],['strace -e trace=openat cat /etc/hosts','Solo apertura de archivos']]],
+['tmux','Sesiones de terminal persistentes.',[['tmux new -s trabajo','Nueva sesión'],['tmux ls','Lista sesiones (Ctrl+b d para salir sin cerrar)'],['tmux attach -t trabajo','Vuelve a la sesión']]]
+]},
+{id:'r',t:'Anexo: red y sistema',d:'Administración de red, servicios, paquetes, usuarios y discos.',c:[
+['ip','Interfaces, direcciones y rutas (sustituye a ifconfig).',[['ip -br a','Resumen de interfaces y IPs'],['ip route','Tabla de rutas y puerta de enlace'],['sudo ip link set eth0 up','Activa una interfaz']]],
+['ss','Conexiones y puertos en escucha (sustituye a netstat).',[['ss -tulpn','Puertos TCP/UDP escuchando y su proceso'],['ss -t state established','Conexiones TCP activas'],['ss -tn dst :443','Conexiones hacia el puerto 443']]],
+['ping','Comprueba conectividad.',[['ping -c 4 1.1.1.1','4 paquetes a una IP'],['ping -c 4 debian.org','Prueba también la resolución DNS'],['ping -c 3 -s 1400 servidor','Tamaño de paquete personalizado']]],
+['curl','Transfiere datos por HTTP, FTP y más.',[['curl -I https://ejemplo.com','Solo cabeceras'],['curl -O https://ejemplo.com/a.zip','Descarga con su nombre'],['curl -X POST -d "a=1" https://api.test/x','Petición POST']]],
+['ssh','Acceso remoto seguro.',[['ssh ana@192.168.1.10',''],['ssh-keygen -t ed25519 && ssh-copy-id ana@srv','Acceso con clave'],['ssh -L 8080:localhost:80 ana@srv','Túnel local']]],
+['dig','Consultas DNS.',[['dig ejemplo.com +short','Solo la IP'],['dig MX ejemplo.com','Registros de correo'],['dig @8.8.8.8 ejemplo.com','Pregunta a un DNS concreto']]],
+['systemctl','Gestiona servicios con systemd.',[['sudo systemctl status nginx','Estado'],['sudo systemctl enable --now nginx','Inicia y activa en el arranque'],['systemctl list-units --failed','Servicios que han fallado']]],
+['apt / dnf','Gestión de paquetes.',[['sudo apt update && sudo apt upgrade','Debian/Ubuntu: actualizar','Debian/Ubuntu'],['sudo dnf install httpd','Fedora/RHEL: instalar','Fedora/RHEL'],['apt search nginx | dnf search nginx','Buscar paquetes (usa el que corresponda)']]],
+['ufw / firewall-cmd','Cortafuegos.',[['sudo ufw allow 22/tcp','Ubuntu: abrir SSH','Ubuntu'],['sudo ufw status verbose','Ubuntu: ver reglas','Ubuntu'],['sudo firewall-cmd --add-service=http --permanent && sudo firewall-cmd --reload','Fedora/RHEL: abrir HTTP','Fedora/RHEL']]],
+['useradd, passwd','Usuarios y contraseñas.',[['sudo useradd -m -s /bin/bash ana','Crea usuario con home'],['sudo passwd ana','Asigna contraseña'],['sudo usermod -aG sudo ana','Añade a sudo (en Fedora el grupo es wheel)']]],
+['lsblk, mount','Discos y particiones.',[['lsblk -f','Dispositivos y sistemas de archivos'],['sudo mount /dev/sdb1 /mnt','Monta una partición'],['free -h','Memoria RAM libre y usada']]]
+]}
+];
+const $=s=>document.querySelector(s),esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let cur='b';
+function card(c){return `<details><summary><b>${esc(c[0])}</b><span>${esc(c[1])}</span></summary><div class="in"><p>${esc(c[1])}</p>${c[2].map(e=>`${e[2]?`<span class="tag">${e[2]}</span>`:''}<div class="ex"><code>${esc(e[0])}</code><button data-c="${esc(e[0]).replace(/"/g,'&quot;')}" aria-label="Copiar">Copiar</button></div>${e[1]?`<p class="n">${esc(e[1])}</p>`:''}`).join('')}</div></details>`}
+function render(){
+const q=$('#q').value.trim().toLowerCase();
+$('#tabs').innerHTML=D.map(l=>`<button role="tab" data-l="${l.id}" aria-selected="${!q&&l.id==cur}">${l.t}</button>`).join('');
+let h='';
+if(q){D.forEach(l=>{const m=l.c.filter(c=>(c[0]+c[1]+c[2].map(e=>e[0]+e[1]).join(' ')).toLowerCase().includes(q));if(m.length)h+=`<h2 class="lv">${l.t}</h2>`+m.map(card).join('')});if(!h)h='<p class="empty">Sin resultados. Prueba con otra palabra.</p>'}
+else{const l=D.find(x=>x.id==cur);h=`<p class="lv">${l.d}</p>`+(l.id=='b'?'<p class="tip">Consejo: pulsa Tab para autocompletar y la flecha arriba para repetir comandos.</p>':'')+(l.id=='r'?'<p class="tip">Los nombres de interfaces, paquetes y servicios cambian según el equipo: confírmalos con «ip -br a» o «systemctl list-units».</p>':'')+l.c.map(card).join('')}
+$('#out').innerHTML=h}
+document.addEventListener('click',e=>{const t=e.target;
+if(t.dataset.l){cur=t.dataset.l;$('#q').value='';render();scrollTo(0,0)}
+if(t.dataset.c){try{navigator.clipboard.writeText(t.dataset.c).then(()=>{t.textContent='Copiado';setTimeout(()=>t.textContent='Copiar',1200)})}catch(x){}}});
+$('#q').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
