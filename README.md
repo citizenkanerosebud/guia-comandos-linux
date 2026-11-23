@@ -7,7 +7,7 @@ Aplicación web de un solo archivo (HTML + CSS + JS, sin dependencias) que expli
 
 ## Uso
 
-Abre `index.html` en el navegador: https://citizenkanerosebud.github.io/guia-comandos-linux/.. No requiere servidor ni instalación.
+Abre `index.html` en el navegador: https://citizenkanerosebud.github.io/guia-comandos-linux/. No requiere servidor ni instalación.
 
 ## Añadir comandos
 
